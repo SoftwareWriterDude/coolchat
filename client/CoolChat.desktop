@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Cool Chat
+Comment=Launcher
+Exec=/usr/bin/python3 coolchat.py
+Icon=icon64.png
+Terminal=false
+Type=Application
+Categories=Utility;

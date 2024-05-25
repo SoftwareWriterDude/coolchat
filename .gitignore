@@ -1,0 +1,4 @@
+client/__pycache__/*
+chatserver
+server.key
+server.crt
