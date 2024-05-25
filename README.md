@@ -2,7 +2,7 @@
 A retro inspired chat software
 
 ## Server usage
-> ./chatserver <ip> <port>
+> ./chatserver ip port
 
 ## Client usage
 * Find a server in the client/serverlist.csv file
