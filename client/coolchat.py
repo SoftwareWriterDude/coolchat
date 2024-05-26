@@ -64,11 +64,13 @@ def connect_clicked(button, message_box, message_entry, ip_entry, port_entry, co
         proxy_ports = [9050, 9150]
         for port in proxy_ports:
             try:
+                print("Trying to connect to tor, please wait...\n")
                 socks.setdefaultproxy(socks.PROXY_TYPE_SOCKS5, "127.0.0.1", port)
                 socket.socket = socks.socksocket
                 break
             except Exception as e:
                 display_message(message_box, f"Failed to connect to proxy on port {port}: {e}")
+                return
 
             display_message(message_box, f"Proxy connection successful on port {port}")
     try:
@@ -119,7 +121,7 @@ def on_key_press_event(widget, event):
         send_message(widget, )
 
 stop_event = threading.Event()
-useTor = False
+useTor = True
 sock = None
 t = None
 
