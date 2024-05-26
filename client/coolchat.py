@@ -107,6 +107,7 @@ def append_message(message_box, message):
     message_box.scroll_to_mark(end_mark, 0.0, use_align=False, xalign=0.5, yalign=1.0)
     
 def on_check_button_toggled(button):
+    global useTor
     if button.get_active():
         useTor = True
     else:
