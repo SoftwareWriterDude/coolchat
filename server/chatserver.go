@@ -40,6 +40,8 @@ var (
 	clientsLock sync.Mutex
 )
 
+var totalClientsPerUptime = 0
+
 type clientInfo struct {
 	conn         net.Conn
 	messageCount int
@@ -128,9 +130,10 @@ func getUsername(client net.Conn) {
     }
     
     // send MOTD
-    client.Write([]byte(fmt.Sprintf("Welcome to Cool chat\nCurrently %d user(s) are connected.", numConnected)))
-
-    client.Write([]byte(fmt.Sprintf("Your ip appears to be: %s\n", clientAddress)))
+	client.Write([]byte(fmt.Sprintf("Welcome to Cool Chat")))
+	client.Write([]byte(fmt.Sprintf("Your ip appears to be: %s\n", clientAddress)))
+	client.Write([]byte(fmt.Sprintf("Currently %d user(s) are connected.", numConnected)))
+	client.Write([]byte(fmt.Sprintf("There have been %d users since last restart", totalClientsPerUptime)))
 
     for {
 
@@ -200,7 +203,8 @@ func getUsername(client net.Conn) {
     clients[username] = &clientInfo{conn: client}
     clientsLock.Unlock()
 
-    // handle the client with a go routine
+    // handle the client with a go routine and increment the visitor counter
+	totalClientsPerUptime++
     go handleClient(client, username)
     
 }

@@ -133,7 +133,7 @@ def main():
     window.connect("destroy", on_window_destroy)
     window.set_icon_from_file("icon64.png")
     window.set_border_width(10)
-    window.set_default_size(1024, 768)
+    window.set_default_size(800, 600)
 
     message_box = Gtk.TextView()
     message_box.set_editable(False)
