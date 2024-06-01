@@ -17,3 +17,5 @@ Run the server
 Eventually there will be a much nicer way to do this and find servers but until then just make a pull request to this repo if you have a server you want added.
 
 ![alt text](demo.png)
+
+![irc sucks](IRCSUCKS.png)
