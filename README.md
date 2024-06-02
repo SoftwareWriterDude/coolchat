@@ -1,6 +1,11 @@
 # coolchat
 A retro inspired chat software
 
+## About
+Cool chat is a retro inspired chat software that was created to demonstrate just how much better things could be compared to IRC, 
+It's goal is to eventually serve as a replacement to the outdated and unsecure IRC protocol.
+It is not designed to function like Dicord or XMPP. there is no store and forwarding of messages, chats happen in real time. 
+
 ## Server usage
 Generate a cert for first time use
 > ./chatserver gencert
