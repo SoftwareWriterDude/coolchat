@@ -79,8 +79,9 @@ def connect_clicked(button, message_box, message_entry, ip_entry, port_entry, co
         context.check_hostname = False
         context.verify_mode = ssl.CERT_NONE
         sock = context.wrap_socket(sock, server_hostname=ip)
-        #sock.setblocking(False)  # Set socket to non-blocking mode
+        sock.settimeout(10)
         sock.connect((ip, port))
+        sock.settimeout(None)
         cert = sock.getpeercert(True)
         cert_info = ssl.DER_cert_to_PEM_cert(cert)
         display_message(message_box, str(cert_info))
