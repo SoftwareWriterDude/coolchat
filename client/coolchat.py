@@ -64,15 +64,14 @@ def connect_clicked(button, message_box, message_entry, ip_entry, port_entry, co
         proxy_ports = [9050, 9150]
         for port in proxy_ports:
             try:
-                print("Trying to connect to tor, please wait...\n")
                 socks.setdefaultproxy(socks.PROXY_TYPE_SOCKS5, "127.0.0.1", port)
                 socket.socket = socks.socksocket
                 break
             except Exception as e:
-                display_message(message_box, f"Failed to connect to proxy on port {port}: {e}")
+                display_message(message_box, f"Failed to set proxy on port {port}: {e}")
+                print("Failed to set Tor proxy. Make sure the Tor daemon or TBB is running\n")
                 return
 
-            display_message(message_box, f"Proxy connection successful on port {port}")
     try:
         global sock
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -94,6 +93,9 @@ def connect_clicked(button, message_box, message_entry, ip_entry, port_entry, co
 
     except Exception as e:
         print("Error connecting:", e)
+        connect_button.set_sensitive(True)
+        disconnect_button.set_sensitive(False)
+        display_message(message_box, "Connection failed, Make sure you typed the location correctly and if using Tor make sure a Tor instance is running.")
         display_message(message_box, str(e))
 
 def display_message(message_box, message):
