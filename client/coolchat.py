@@ -7,6 +7,55 @@ import socket
 import socks#PySocks
 import threading
 import ssl
+import csv
+
+def on_serverlist_button_clicked(button, listbox):
+    # Open the CSV file and read its contents
+    with open('serverlist.csv', 'r') as file:
+        reader = csv.reader(file)
+        for row in reader:
+            if row:
+                # Combine the 3 values of each row to create the button label
+                label_text = '    '.join(row[:3])
+                # Create a new button for each item in the CSV
+                item = Gtk.Button(label=label_text)  # Specify the label keyword argument
+                item.set_margin_bottom(5)
+                item.connect("clicked", on_item_clicked, str(row[1]), str(row[2]))
+                listbox.add(item)
+            listbox.show_all()
+
+def on_item_clicked(event, ip, port):
+    print("Item clicked: ")
+    global ip_entry
+    global port_entry
+    ip_entry.set_text(ip)
+    port_entry.set_text(port)
+
+# The server list CSV viwer window
+def create_serverlist_window(event):
+    window = Gtk.Window(title="Server List CSV")
+    window.set_default_size(800, 600)
+
+    main_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
+    window.add(main_box)
+
+    listbox = Gtk.ListBox()
+
+    scroll = Gtk.ScrolledWindow()
+    scroll.set_hexpand(True)
+    scroll.set_vexpand(True)
+    scroll.add(listbox)
+
+    scroll.set_margin_top(1)
+    scroll.set_margin_bottom(1)
+    scroll.set_margin_start(1)
+
+    main_box.pack_start(scroll, True, True, 0)
+
+    button = Gtk.Button.new_with_label("Load CSV")
+    button.connect("clicked", on_serverlist_button_clicked, listbox)
+    main_box.pack_start(button, False, False, 0)
+    window.show_all()
 
 #unfortunately i cant find a way to gracefully exit this thread, 
 #the thread will run until its told to stop but must wait for data to break out of its loop
@@ -129,6 +178,10 @@ useTor = True
 sock = None
 t = None
 
+# Global variables for ip and port
+ip_entry = Gtk.Entry()
+port_entry = Gtk.Entry()
+
 def main():
     Gtk.init(None)
 
@@ -150,10 +203,12 @@ def main():
     scroll.set_margin_bottom(1)
     scroll.set_margin_start(1)
 
-    ip_entry = Gtk.Entry()
+    #ip_entry = Gtk.Entry()
+    global ip_entry
     ip_entry.set_placeholder_text("IP Address")
 
-    port_entry = Gtk.Entry()
+    #port_entry = Gtk.Entry()
+    global port_entry
     port_entry.set_placeholder_text("Port")
 
     message_entry = Gtk.Entry()
@@ -179,33 +234,45 @@ def main():
     torCheckBox.connect("toggled", on_check_button_toggled)
     torCheckBox.set_active(True)
 
+    # Menu Bar
+    menubar = Gtk.MenuBar()
+    file_menu = Gtk.Menu()
+    file_menu_item = Gtk.MenuItem(label="File")
+    file_menu_item.set_submenu(file_menu)
+    server_list_item = Gtk.MenuItem(label="Server List")
+    server_list_item.connect("activate", create_serverlist_window)
+    file_menu.append(server_list_item)
+    menubar.append(file_menu_item)
+
+
+    # Setup the GUI elements, attach(column, row, width, height)
     grid = Gtk.Grid()
-    grid.set_column_spacing(10)
-    grid.set_row_spacing(10)
-    grid.attach(ip_entry, 0, 0, 1, 1)
+    grid.set_column_spacing(5)
+    grid.set_row_spacing(5)
+    grid.attach(menubar, 0, 0, 5, 1)
+    grid.attach(ip_entry, 0, 1, 1, 1)
     grid.attach_next_to(port_entry, ip_entry, Gtk.PositionType.RIGHT, 1, 1)
     grid.attach_next_to(torCheckBox, port_entry, Gtk.PositionType.RIGHT,1,1)
     grid.attach_next_to(connect_button, torCheckBox, Gtk.PositionType.RIGHT, 1, 1)
     grid.attach_next_to(disconnect_button, connect_button, Gtk.PositionType.RIGHT, 1, 1)
-    grid.attach(scroll, 0, 1, 5, 1)
-    grid.attach(message_entry, 0, 2, 4, 1)
+    grid.attach(scroll, 0, 2, 5, 1)
+    grid.attach(message_entry, 0, 3, 4, 1)
     grid.attach_next_to(send_button, message_entry, Gtk.PositionType.RIGHT, 1, 1)
-
-    # Load CSS from file
-    #css_provider = Gtk.CssProvider()
-    #css_provider.load_from_path('style.css')
-
-    # Apply the CSS to the current screen
-    #screen = Gdk.Screen.get_default()
-    #style_context = Gtk.StyleContext()
-    #style_context.add_provider_for_screen(screen, css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
 
     # Load CSS file
     css_provider = Gtk.CssProvider()
     css_provider.load_from_path("style.css")
 
-    context = message_box.get_style_context()
-    context.add_provider(css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
+    # Choose which parts of the UI we want styled by the CSS
+    # message_box
+    msg_boxContext = message_box.get_style_context()
+    msg_boxContext.add_provider(css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
+    # message_entry
+    msg_entryContext = message_entry.get_style_context()
+    msg_entryContext.add_provider(css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
+    # menubar
+    menubar_context = menubar.get_style_context()
+    menubar_context.add_provider(css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
 
 
     window.add(grid)
