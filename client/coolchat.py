@@ -9,7 +9,7 @@ import threading
 import ssl
 import csv
 
-def on_serverlist_button_clicked(button, listbox):
+def on_serverlist_button_clicked(button, listbox, window):
     # Open the CSV file and read its contents
     with open('serverlist.csv', 'r') as file:
         reader = csv.reader(file)
@@ -20,16 +20,16 @@ def on_serverlist_button_clicked(button, listbox):
                 # Create a new button for each item in the CSV
                 item = Gtk.Button(label=label_text)  # Specify the label keyword argument
                 item.set_margin_bottom(5)
-                item.connect("clicked", on_item_clicked, str(row[1]), str(row[2]))
+                item.connect("clicked", on_item_clicked, str(row[1]), str(row[2]), window)
                 listbox.add(item)
             listbox.show_all()
 
-def on_item_clicked(event, ip, port):
-    print("Item clicked: ")
+def on_item_clicked(event, ip, port, window):
     global ip_entry
     global port_entry
     ip_entry.set_text(ip)
     port_entry.set_text(port)
+    window.destroy()
 
 # The server list CSV viwer window
 def create_serverlist_window(event):
@@ -53,7 +53,7 @@ def create_serverlist_window(event):
     main_box.pack_start(scroll, True, True, 0)
 
     button = Gtk.Button.new_with_label("Load CSV")
-    button.connect("clicked", on_serverlist_button_clicked, listbox)
+    button.connect("clicked", on_serverlist_button_clicked, listbox, window)
     main_box.pack_start(button, False, False, 0)
     window.show_all()
 
@@ -273,6 +273,18 @@ def main():
     # menubar
     menubar_context = menubar.get_style_context()
     menubar_context.add_provider(css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
+    # checkbox
+    torCheckBox_context = torCheckBox.get_style_context()
+    torCheckBox_context.add_provider(css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
+    # connect button
+    connectButton_context = connect_button.get_style_context()
+    connectButton_context.add_provider(css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
+    # disconnect button
+    disconnectButton_context = disconnect_button.get_style_context()
+    disconnectButton_context.add_provider(css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
+    # send button
+    sendButton_context = send_button.get_style_context()
+    sendButton_context.add_provider(css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
 
 
     window.add(grid)
