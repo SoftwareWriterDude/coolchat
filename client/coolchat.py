@@ -8,6 +8,7 @@ import socks#PySocks
 import threading
 import ssl
 import csv
+import os
 
 def on_serverlist_button_clicked(button, listbox, window):
     # Open the CSV file and read its contents
@@ -31,10 +32,25 @@ def on_item_clicked(event, ip, port, window):
     port_entry.set_text(port)
     window.destroy()
 
+def manage_server_daemon(event, command, message_box):
+    global server_running
+    if server_running == True and command != 1:
+        display_message(message_box, "Chat server is already running.")
+        return
+    if command == 0:
+        os.system("../server/bin/chatserver 127.0.0.1 8000")
+        display_message(message_box, "Chat server started on 127.0.0.1 8000. Users can access it remotely at yourtornhostname.onion located in the hostname file in your tor directory")
+        server_running = True
+    if command == 1:
+        os.system("pgrep chatserver | xargs kill")
+        display_message(message_box, "Chat server stopped.")
+        server_running = False
+
 # The server list CSV viwer window
 def create_serverlist_window(event):
     window = Gtk.Window(title="Server List CSV")
     window.set_default_size(800, 600)
+    window.set_icon_from_file("icon64.png")
 
     main_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
     window.add(main_box)
@@ -173,6 +189,7 @@ def on_key_press_event(widget, event):
     if event.keyval == Gdk.KEY_Return:
         send_message(widget, )
 
+server_running = False
 stop_event = threading.Event()
 useTor = True
 sock = None
@@ -242,7 +259,17 @@ def main():
     server_list_item = Gtk.MenuItem(label="Server List")
     server_list_item.connect("activate", create_serverlist_window)
     file_menu.append(server_list_item)
+    server_daemon_menu = Gtk.Menu()
+    server_daemon_item = Gtk.MenuItem(label="Server Daemon")
+    server_daemon_item.set_submenu(server_daemon_menu)
+    server_daemon_start = Gtk.MenuItem(label="Start")
+    server_daemon_stop = Gtk.MenuItem(label="Stop")
+    server_daemon_start.connect("activate", manage_server_daemon, 0, message_box)
+    server_daemon_stop.connect("activate", manage_server_daemon, 1, message_box)
+    server_daemon_menu.append(server_daemon_start)
+    server_daemon_menu.append(server_daemon_stop)
     menubar.append(file_menu_item)
+    menubar.append(server_daemon_item)
 
 
     # Setup the GUI elements, attach(column, row, width, height)
